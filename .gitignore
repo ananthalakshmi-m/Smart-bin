@@ -1,0 +1,17 @@
+# Ignore temporary files
+*.log
+*.tmp
+*.bak
+
+# Arduino build folder
+/build/
+
+# Node modules if any backend
+/node_modules/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Video render cache
+*.mp4.tmp

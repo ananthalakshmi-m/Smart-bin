@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Dustbin Monitor</title>
+
+  <style>
+    /* Page Styles */
+    body {
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+      background: url("smartbin.png") center/cover no-repeat;
+      margin: 0;
+      padding: 0;
+      color: white;
+    }
+
+    /* Overlay for readability */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: -1;
+    }
+
+    /* Container */
+    .container {
+      max-width: 500px;
+      margin: 60px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
+      color: #333;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .container:hover { transform: scale(1.02); }
+
+    h1 {
+      color: #2C3E50;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    /* Level Box */
+    .level-box {
+      font-size: 32px;
+      font-weight: bold;
+      padding: 20px;
+      margin: 25px 0;
+      border-radius: 10px;
+      display: inline-block;
+      width: 85%;
+      text-align: center;
+      transition: background 0.3s, transform 0.2s;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .level-box:hover { transform: scale(1.05); }
+
+    /* Alert Levels */
+    .low    { background: #28a745; color: white; }
+    .medium { background: #ffc107; color: black; }
+    .high   { background: #dc3545; color: white; }
+    .full   { background: #8B0000; color: white; animation: blink 1s infinite; }
+
+    @keyframes blink { 50% { opacity: 0.5; } }
+
+    /* Emoji */
+    .emoji {
+      font-size: 40px;
+      display: block;
+      margin-top: 10px;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .emoji:hover { transform: rotate(10deg) scale(1.2); }
+
+    /* Status */
+    .status {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 30px;
+      font-size: 15px;
+      color: #555;
+    }
+  </style>
+
+  <script>
+    async function fetchLevel() {
+      try {
+        let response = await fetch("http://localhost:3000/level");
+        let data = await response.json();
+        let level = parseFloat(data.level);
+
+        let levelBox = document.getElementById("level");
+        let statusText = document.getElementById("status");
+        let emoji = document.getElementById("emoji");
+
+        levelBox.innerText = level + " %";
+
+        // Set styles and messages based on bin level
+        if (level < 50) {
+          levelBox.className = "level-box low";
+          statusText.innerText = "Dustbin is empty. 😊";
+          emoji.innerText = "🗑️";
+        } else if (level >= 50 && level < 70) {
+          levelBox.className = "level-box medium";
+          statusText.innerText = "Dustbin is filling up. ⚠️";
+          emoji.innerText = "🗑️🗑️";
+        } else if (level >= 70 && level < 90) {
+          levelBox.className = "level-box high";
+          statusText.innerText = "Dustbin is almost full! 🚨";
+          emoji.innerText = "🗑️🗑️🗑️";
+        } else {
+          levelBox.className = "level-box full";
+          statusText.innerText = "Dustbin is FULL! EMPTY IT NOW! 🚨❗";
+          emoji.innerText = "🗑️🔥";
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        document.getElementById("status").innerText = "Error fetching data!";
+      }
+    }
+
+    setInterval(fetchLevel, 2000); // Refresh every 2 sec
+    window.onload = fetchLevel;
+  </script>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Smart Dustbin Monitoring System</h1>
+    <div id="level" class="level-box">Loading...</div>
+    <span id="emoji" class="emoji">🗑️</span>
+    <p id="status" class="status">Fetching data...</p>
+    <p class="footer">Updates every 2 seconds</p>
+  </div>
+</body>
+</html>
